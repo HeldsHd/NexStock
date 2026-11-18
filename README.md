@@ -4,7 +4,7 @@ Sistema de gestão de estoque de roupas, desenvolvido como projeto fictício em 
 
 ## Sobre o projeto
 
-O objetivo do NexStock é oferecer uma aplicação para organizar e acompanhar o estoque de uma loja de roupas. O repositório está em desenvolvimento: o frontend ainda contém a página inicial padrão do Next.js, e o backend ainda não possui rotas ou uma configuração para iniciar o servidor.
+O objetivo do NexStock é oferecer uma aplicação para organizar e acompanhar o estoque de uma loja de roupas. O repositório está em desenvolvimento: o frontend ainda contém a página inicial padrão do Next.js, e o backend possui um servidor Express com uma rota inicial para verificar seu funcionamento.
 
 ## Tecnologias
 
@@ -39,13 +39,33 @@ npm run dev
 
 Acesse [http://localhost:3000](http://localhost:3000).
 
-O backend ainda não possui um script de inicialização (`start` ou `dev`). Por isso, embora suas dependências estejam instaladas, a API ainda não pode ser iniciada por um comando npm.
+Para iniciar o backend em modo de desenvolvimento, abra outro terminal:
+
+```bash
+cd BackEnd
+npm run dev
+```
+
+Acesse [http://localhost:3001](http://localhost:3001). A única rota, `GET /`, responde:
+
+```json
+{ "mensagem": "Servidor NexStock funcionando!" }
+```
+
+O servidor reinicia automaticamente quando o código é alterado. Para mudar a porta, copie `BackEnd/.env.example` para `BackEnd/.env` e ajuste `PORT`. Sem esse arquivo, a porta padrão é 3001.
+
+Para gerar e executar o JavaScript compilado, no diretório `BackEnd`:
+
+```bash
+npm run build
+npm start
+```
 
 ## Estrutura do repositório
 
 ```text
 NexStock/
-├── BackEnd/   # API Express (em configuração)
+├── BackEnd/   # API Express
 └── frontend/  # Aplicação Next.js
 ```
 
@@ -60,4 +80,11 @@ No diretório `frontend`:
 | `npm run start` | Inicia a versão de produção após o build. |
 | `npm run lint` | Executa o ESLint. |
 
-No diretório `BackEnd`, o script de teste ainda é apenas um placeholder; testes e scripts para executar a API serão configurados junto com a implementação do backend.
+No diretório `BackEnd`:
+
+| Comando | Descrição |
+| --- | --- |
+| `npm run dev` | Executa o TypeScript e reinicia o servidor ao alterar o código. |
+| `npm run typecheck` | Verifica os tipos sem gerar arquivos. |
+| `npm run build` | Compila o TypeScript para a pasta `dist/`. |
+| `npm start` | Executa `dist/app.js` após o build. |
