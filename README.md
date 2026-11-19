@@ -4,7 +4,7 @@ Sistema de gestão de estoque de roupas, desenvolvido como projeto fictício em 
 
 ## Sobre o projeto
 
-O objetivo do NexStock é oferecer uma aplicação para organizar e acompanhar o estoque de uma loja de roupas. O repositório está em desenvolvimento: o frontend ainda contém a página inicial padrão do Next.js, e o backend possui um servidor Express com uma rota inicial para verificar seu funcionamento.
+O objetivo do NexStock é oferecer uma aplicação para organizar e acompanhar o estoque de uma loja de roupas. O frontend possui uma home responsiva com resumo do estoque, movimentações e alertas de reposição. As variáveis visuais ficam em `frontend/styles/tokens.css`, os componentes em `frontend/components` e a composição da página em `frontend/app/home/page.tsx`, acessível em `/home`. A rota `/` redireciona para `/home`. Os indicadores e a busca usam dados de demonstração; novos produtos ficam disponíveis apenas durante a sessão. O backend possui um servidor Express com uma rota inicial para verificar seu funcionamento.
 
 ## Tecnologias
 
