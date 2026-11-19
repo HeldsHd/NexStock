@@ -1,0 +1,248 @@
+/* Layout responsivo da página de login. */
+.screen {
+  --color-surface: var(--color-login-input);
+  --color-border: var(--color-login-border);
+  --color-text-muted: var(--color-login-muted);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--color-login-background), var(--color-login-glow) 45%, var(--color-login-background));
+}
+
+.screen::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 4% 14%, var(--color-login-star) 0 0.8px, transparent 1.2px),
+    radial-gradient(circle at 8% 25%, var(--color-login-muted) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 21% 31%, var(--color-login-star) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 29% 10%, var(--color-login-muted) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 37% 43%, var(--color-login-muted) 0 0.7px, transparent 1.1px),
+    radial-gradient(circle at 6% 81%, var(--color-login-star) 0 0.7px, transparent 1px),
+    radial-gradient(circle at 19% 89%, var(--color-login-muted) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 32% 94%, var(--color-login-star) 0 0.7px, transparent 1.2px),
+    radial-gradient(circle at 43% 74%, var(--color-login-muted) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 48% 58%, var(--color-login-muted) 0 0.7px, transparent 1px),
+    radial-gradient(circle at 66% 18%, var(--color-login-star) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 92% 23%, var(--color-login-muted) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 91% 79%, var(--color-login-star) 0 0.7px, transparent 1.1px),
+    radial-gradient(circle at 80% 92%, var(--color-login-muted) 0 0.6px, transparent 1px);
+  opacity: 0.45;
+  pointer-events: none;
+  content: "";
+}
+
+.branding {
+  position: absolute;
+  z-index: 3;
+  top: var(--space-8);
+  left: var(--space-8);
+}
+
+.logo {
+  font-size: 1.75rem;
+  letter-spacing: -1px;
+}
+
+.logo svg {
+  width: 34px;
+  height: 30px;
+}
+
+.story {
+  display: none;
+}
+
+.formPanel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: calc(100svh - 2px);
+  padding: 160px var(--space-8) 128px;
+}
+
+.platformLabel {
+  display: none;
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 488px;
+}
+
+.copyright {
+  position: absolute;
+  z-index: 2;
+  right: var(--space-8);
+  bottom: var(--space-16);
+  left: var(--space-8);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0.75;
+}
+
+@media (max-width: 359px) {
+  .branding {
+    left: var(--space-6);
+  }
+
+  .formPanel {
+    padding-inline: var(--space-6);
+  }
+}
+
+@media (min-width: 640px) {
+  .branding {
+    top: var(--space-12);
+    left: var(--space-16);
+  }
+
+  .logo {
+    font-size: var(--text-3xl);
+  }
+
+  .logo svg {
+    width: 38px;
+    height: 34px;
+  }
+
+  .formPanel {
+    padding: 192px var(--space-12) 80px;
+  }
+
+  .card {
+    max-width: 568px;
+    min-height: 672px;
+    padding: 56px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-login-card);
+  }
+
+  .copyright {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .screen {
+    grid-template-columns: 56.25% minmax(0, 1fr);
+    background: var(--color-login-background);
+  }
+
+  .branding {
+    top: var(--space-16);
+    left: 80px;
+  }
+
+  .story {
+    position: relative;
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .story::before {
+    position: absolute;
+    top: 46%;
+    right: 7%;
+    width: 130%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 32% 44%, var(--color-login-orbit-inner), var(--color-login-orbit-outer) 75%);
+    transform: translateY(-50%);
+    content: "";
+  }
+
+  .storyTitle {
+    position: absolute;
+    z-index: 2;
+    top: 38%;
+    left: 13.2%;
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(3rem, 3.75vw, 4.5rem);
+    font-weight: var(--font-semibold);
+    line-height: 1.08;
+    letter-spacing: -1.6px;
+  }
+
+  .storyCopy {
+    position: absolute;
+    z-index: 2;
+    right: var(--space-12);
+    bottom: 132px;
+    left: 80px;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+  }
+
+  .storySignature {
+    position: absolute;
+    z-index: 2;
+    right: var(--space-12);
+    bottom: var(--space-10);
+    left: 80px;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.625rem;
+    line-height: 1.8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .formPanel {
+    --panel-padding: clamp(40px, 9.2vw, 176px);
+
+    align-items: flex-start;
+    padding: clamp(160px, 24.4svh, 264px) var(--panel-padding) 144px;
+    border-left: 1px solid var(--color-border);
+    background: linear-gradient(135deg, var(--color-login-background), var(--color-login-glow) 50%, var(--color-login-background));
+  }
+
+  .platformLabel {
+    position: absolute;
+    z-index: 2;
+    top: clamp(64px, 11.1svh, 120px);
+    left: var(--panel-padding);
+    display: block;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.625rem;
+    line-height: 1.8;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .card {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .copyright {
+    right: var(--panel-padding);
+    left: var(--panel-padding);
+    display: block;
+    text-align: left;
+  }
+}
