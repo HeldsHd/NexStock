@@ -1,6 +1,5 @@
-export default function login(){
-  return(
-    <h1></h1>
-  )
-}
+import { redirect } from "next/navigation";
 
+export default function IndexPage() {
+  redirect("/home");
+}
