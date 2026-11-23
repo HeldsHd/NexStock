@@ -84,3 +84,11 @@
     animation: none !important;
   }
 }
+
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  transition: none !important;
+  animation: none !important;
+}

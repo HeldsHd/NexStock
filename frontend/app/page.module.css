@@ -2,6 +2,7 @@
 .screen {
   --color-surface: var(--color-login-input);
   --color-border: var(--color-login-border);
+  --color-text: #f1f5ff;
   --color-text-muted: var(--color-login-muted);
 
   position: relative;
