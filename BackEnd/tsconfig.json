@@ -1,3 +1,4 @@
+
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -11,6 +12,12 @@
     "noEmitOnError": true,
     "types": ["node"]
   },
-  "include": ["*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "seed.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

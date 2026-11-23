@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Eye,
@@ -12,13 +13,16 @@ import {
 } from "lucide-react";
 
 export default function Login() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [lembrar, setLembrar] = useState(false);
   const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  function entrar(event: FormEvent<HTMLFormElement>) {
+  async function entrar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErro("");
 
@@ -32,9 +36,36 @@ export default function Login() {
       return;
     }
 
-    // Integre aqui sua autenticação real.
-    // Não autentique apenas verificando os campos no frontend.
-    console.log("Formulário validado", { email, lembrar });
+    setCarregando(true);
+
+    try {
+      const resposta = await fetch("http://localhost:3001/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: email.trim(),
+          senha,
+          lembrar,
+        }),
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        setErro(dados.erro || "Não foi possível entrar.");
+        return;
+      }
+
+      router.push("/home");
+      router.refresh();
+    } catch {
+      setErro("Não foi possível conectar ao servidor.");
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
@@ -113,7 +144,7 @@ export default function Login() {
             Acesso à plataforma
           </div>
 
-          <div className="flex flex-1 flex-col justify-center py-5 md:py-12">
+          <div className="flex flex-1 flex-col justify-center py-5 md:py-12 lg:py-12">
             <div className="mb-8">
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#b8aafa]">
                 Bem-vindo de volta
@@ -152,7 +183,8 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
                     required
-                    className="h-12 w-full rounded-lg border border-[#303b55] bg-[#0b1120]/90 pl-11 pr-4 text-sm text-white outline-none transition-all duration-200 placeholder:text-[#69748d] hover:border-[#4b5875] focus:border-[#ff6417] focus:ring-2 focus:ring-[#ff6417]/15"
+                    disabled={carregando}
+                    className="h-12 w-full rounded-lg border border-[#303b55] bg-[#0b1120]/90 pl-11 pr-4 text-sm text-white outline-none transition-all duration-200 placeholder:text-[#69748d] hover:border-[#4b5875] focus:border-[#ff6417] focus:ring-2 focus:ring-[#ff6417]/15 disabled:opacity-60"
                   />
                 </div>
               </div>
@@ -180,7 +212,8 @@ export default function Login() {
                     onChange={(e) => setSenha(e.target.value)}
                     placeholder="Digite sua senha"
                     required
-                    className="h-12 w-full rounded-lg border border-[#303b55] bg-[#0b1120]/90 pl-11 pr-12 text-sm text-white outline-none transition-all duration-200 placeholder:text-[#69748d] hover:border-[#4b5875] focus:border-[#ff6417] focus:ring-2 focus:ring-[#ff6417]/15"
+                    disabled={carregando}
+                    className="h-12 w-full rounded-lg border border-[#303b55] bg-[#0b1120]/90 pl-11 pr-12 text-sm text-white outline-none transition-all duration-200 placeholder:text-[#69748d] hover:border-[#4b5875] focus:border-[#ff6417] focus:ring-2 focus:ring-[#ff6417]/15 disabled:opacity-60"
                   />
 
                   <button
@@ -208,6 +241,7 @@ export default function Login() {
                     type="checkbox"
                     checked={lembrar}
                     onChange={(e) => setLembrar(e.target.checked)}
+                    disabled={carregando}
                     className="size-4 cursor-pointer accent-[#ff6417]"
                   />
                   Lembrar de mim
@@ -230,13 +264,17 @@ export default function Login() {
               {/* ENTRAR */}
               <button
                 type="submit"
-                className="group flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#ff6417] text-sm font-bold text-[#11131b] shadow-[0_8px_25px_rgba(255,100,23,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ff792f] hover:shadow-[0_12px_30px_rgba(255,100,23,0.25)] active:translate-y-0 active:scale-[0.99]"
+                disabled={carregando}
+                className="group flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-[#ff6417] text-sm font-bold text-[#11131b] shadow-[0_8px_25px_rgba(255,100,23,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ff792f] hover:shadow-[0_12px_30px_rgba(255,100,23,0.25)] active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Entrar
-                <ArrowRight
-                  size={17}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                />
+                {carregando ? "Entrando..." : "Entrar"}
+
+                {!carregando && (
+                  <ArrowRight
+                    size={17}
+                    className="transition-transform duration-200 group-hover:translate-x-1"
+                  />
+                )}
               </button>
             </form>
 
