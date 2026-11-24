@@ -2,47 +2,18 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/icon";
+import { formatCurrency, formatNumber } from "@/lib/dashboard";
+import { listProducts, restockProduct, type CatalogProduct } from "@/lib/products";
 import styles from "./replacement-dashboard.module.css";
 
-type StockProduct = {
-  id: number;
-  name: string;
-  sku: string;
-  category: string;
-  unitCost: number;
-  quantity: number;
-  minimum: number;
-};
-
 type StatusFilter = "all" | "low" | "out";
-
-const initialProducts: StockProduct[] = [
-  { id: 1, name: "Calça bag neon", sku: "CAL-001", category: "Calças", unitCost: 120, quantity: 0, minimum: 20 },
-  { id: 2, name: "Camiseta básica preta", sku: "CAM-010", category: "Camisas", unitCost: 49.9, quantity: 0, minimum: 30 },
-  { id: 3, name: "Moletom canguru", sku: "MOL-004", category: "Moletons", unitCost: 189, quantity: 0, minimum: 10 },
-  { id: 4, name: "Boné aba reta", sku: "BON-002", category: "Acessórios", unitCost: 59, quantity: 0, minimum: 25 },
-  { id: 5, name: "Meia esportiva", sku: "MEI-030", category: "Acessórios", unitCost: 19.9, quantity: 9, minimum: 40 },
-  { id: 6, name: "Short tactel", sku: "SHO-015", category: "Shorts", unitCost: 69, quantity: 5, minimum: 20 },
-  { id: 7, name: "Tênis casual", sku: "TEN-007", category: "Calçados", unitCost: 229.9, quantity: 12, minimum: 25 },
-  { id: 8, name: "Jaqueta corta-vento", sku: "JAC-003", category: "Jaquetas", unitCost: 159, quantity: 7, minimum: 15 },
-  { id: 9, name: "Regata fitness", sku: "REG-011", category: "Camisas", unitCost: 39.9, quantity: 14, minimum: 30 },
-  { id: 10, name: "Legging esportiva", sku: "LEG-018", category: "Calças", unitCost: 89.9, quantity: 6, minimum: 20 },
-  { id: 11, name: "Mochila urbana", sku: "MOC-020", category: "Acessórios", unitCost: 139.9, quantity: 8, minimum: 18 },
-  { id: 12, name: "Garrafa térmica", sku: "GAR-008", category: "Acessórios", unitCost: 79.9, quantity: 11, minimum: 24 },
-];
-
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-  minimumFractionDigits: 2,
-});
 
 function normalize(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
 }
 
-function suggestedQuantity(product: StockProduct) {
-  return Math.max(product.minimum * 2 - product.quantity, 0);
+function suggestedQuantity(product: CatalogProduct) {
+  return Math.max(product.minimumStock * 2 - product.quantity, product.quantity === 0 ? 1 : 0);
 }
 
 function EntryDialog({
@@ -50,19 +21,20 @@ function EntryDialog({
   onClose,
   onSubmit,
 }: {
-  product: StockProduct;
+  product: CatalogProduct;
   onClose: () => void;
-  onSubmit: (quantity: number) => void;
+  onSubmit: (quantity: number) => Promise<void>;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [quantity, setQuantity] = useState(String(suggestedQuantity(product)));
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     dialogRef.current?.showModal();
   }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const received = Number(quantity);
 
@@ -71,7 +43,13 @@ function EntryDialog({
       return;
     }
 
-    onSubmit(received);
+    setSaving(true);
+    try {
+      await onSubmit(received);
+    } catch (cause) {
+      setError(cause instanceof TypeError ? "Não foi possível conectar ao servidor. Tente novamente." : cause instanceof Error ? cause.message : "Não foi possível concluir a reposição.");
+      setSaving(false);
+    }
   }
 
   return (
@@ -82,23 +60,23 @@ function EntryDialog({
       aria-describedby="entry-description"
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!saving) onClose();
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget && !saving) onClose();
       }}
     >
       <div className="dialog-content">
         <div className="dialog-heading">
           <h2 id="entry-title">Dar entrada no estoque</h2>
-          <button className="icon-button" type="button" aria-label="Fechar janela" onClick={onClose}>
+          <button className="icon-button" type="button" aria-label="Fechar janela" disabled={saving} onClick={onClose}>
             <Icon name="close" />
           </button>
         </div>
         <p id="entry-description" className="dialog-description">
-          Informe quantas unidades de <strong>{product.name}</strong> chegaram. Esta demonstração atualiza a lista apenas nesta sessão.
+          Informe quantas unidades de <strong>{product.name}</strong> chegaram.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(event) => void handleSubmit(event)} aria-busy={saving}>
           <div className="form-field">
             <label htmlFor="received-quantity">Quantidade recebida</label>
             <input
@@ -109,6 +87,7 @@ function EntryDialog({
               step="1"
               inputMode="numeric"
               value={quantity}
+              disabled={saving}
               onChange={(event) => {
                 setQuantity(event.target.value);
                 setError("");
@@ -119,8 +98,10 @@ function EntryDialog({
           </div>
           {error && <p className="form-error" role="alert">{error}</p>}
           <div className="dialog-actions">
-            <button type="button" className="button button--secondary" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="button button--primary">Confirmar entrada</button>
+            <button type="button" className="button button--secondary" disabled={saving} onClick={onClose}>Cancelar</button>
+            <button type="submit" className="button button--primary" disabled={saving}>
+              {saving ? "Salvando..." : "Confirmar entrada"}
+            </button>
           </div>
         </form>
       </div>
@@ -129,18 +110,47 @@ function EntryDialog({
 }
 
 export function ReplacementDashboard() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [selectedProduct, setSelectedProduct] = useState<StockProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<CatalogProduct | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [revision, setRevision] = useState(0);
   const actionTriggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const lowCount = products.filter((product) => product.quantity > 0 && product.quantity < product.minimum).length;
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function load() {
+      try {
+        const result = await listProducts(controller.signal);
+        if (!controller.signal.aborted) setProducts(result);
+      } catch (cause) {
+        if (!controller.signal.aborted) {
+          setError(cause instanceof TypeError ? "Não foi possível conectar ao servidor. Tente novamente." : cause instanceof Error ? cause.message : "Não foi possível carregar os produtos.");
+        }
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => controller.abort();
+  }, [revision]);
+
+  function reload() {
+    setLoading(true);
+    setError("");
+    setRevision((value) => value + 1);
+  }
+
+  const lowCount = products.filter((product) => product.quantity > 0 && product.quantity <= product.minimumStock).length;
   const outCount = products.filter((product) => product.quantity === 0).length;
   const normalizedQuery = normalize(query.trim());
   const filteredProducts = products.filter((product) => {
-    const needsRestock = product.quantity < product.minimum;
+    const needsRestock = product.quantity === 0 || product.quantity <= product.minimumStock;
     const matchesStatus = status === "all" || (status === "out" ? product.quantity === 0 : product.quantity > 0 && needsRestock);
     const matchesQuery = normalize(`${product.name} ${product.sku} ${product.category}`).includes(normalizedQuery);
     return needsRestock && matchesStatus && matchesQuery;
@@ -164,11 +174,10 @@ export function ReplacementDashboard() {
     }
   }
 
-  function registerEntry(product: StockProduct, received: number) {
-    setProducts((current) => current.map((item) =>
-      item.id === product.id ? { ...item, quantity: item.quantity + received } : item,
-    ));
-    setAnnouncement(`Entrada de ${received} unidades de ${product.name} registrada nesta sessão.`);
+  async function registerEntry(product: CatalogProduct, received: number) {
+    const updated = await restockProduct(product.id, received);
+    setProducts((current) => current.map((item) => item.id === updated.id ? updated : item));
+    setAnnouncement(`Entrada de ${received} unidades de ${product.name} registrada com sucesso.`);
     closeEntryDialog();
   }
 
@@ -186,7 +195,7 @@ export function ReplacementDashboard() {
           type="button"
           className={`button button--primary ${styles.copyButton}`}
           onClick={() => void copyPurchaseList()}
-          disabled={filteredProducts.length === 0}
+          disabled={loading || Boolean(error) || filteredProducts.length === 0}
         >
           Copiar lista de compra
         </button>
@@ -229,11 +238,22 @@ export function ReplacementDashboard() {
       <div className={styles.listHeading}>
         <h2>Produtos para repor</h2>
         <p aria-live="polite">
-          {filteredProducts.length} {filteredProducts.length === 1 ? "registro" : "registros"} · {lowCount} baixos · {outCount} esgotados
+          {loading ? "Carregando..." : error ? "Lista indisponível" : `${formatNumber(filteredProducts.length)} ${filteredProducts.length === 1 ? "registro" : "registros"} · ${formatNumber(lowCount)} baixos · ${formatNumber(outCount)} esgotados`}
         </p>
       </div>
 
-      {filteredProducts.length > 0 ? (
+      {error ? (
+        <div className={styles.emptyState} role="alert">
+          <Icon name="box" />
+          <h3>Não foi possível carregar as reposições</h3>
+          <p>{error}</p>
+          <button type="button" className="button button--secondary" onClick={reload}>Tentar novamente</button>
+        </div>
+      ) : loading ? (
+        <div className={styles.emptyState} role="status">
+          <p>Carregando produtos...</p>
+        </div>
+      ) : filteredProducts.length > 0 ? (
         <div className={styles.tableContainer}>
           <div className={styles.tableScroll} tabIndex={0} role="region" aria-label="Tabela de produtos para repor">
             <table className={styles.table}>
@@ -259,14 +279,14 @@ export function ReplacementDashboard() {
                           <span className={styles.productNumber}>{String(product.id).padStart(2, "0")}</span>
                           <span className={styles.productDetails}>
                             <span className={styles.productName}>{product.name}</span>
-                            <span className={styles.productDescription}>{currency.format(product.unitCost)} por unidade</span>
+                            <span className={styles.productDescription}>{formatCurrency(product.unitCost)} por unidade</span>
                           </span>
                         </div>
                       </th>
-                      <td className={styles.sku}>{product.sku}</td>
-                      <td>{product.category}</td>
-                      <td className={styles.numericCell}>{product.quantity}</td>
-                      <td className={styles.numericCell}>{product.minimum}</td>
+                      <td className={styles.sku}>{product.sku || "—"}</td>
+                      <td>{product.category || "—"}</td>
+                      <td className={styles.numericCell}>{formatNumber(product.quantity)}</td>
+                      <td className={styles.numericCell}>{formatNumber(product.minimumStock)}</td>
                       <td className={`${styles.numericCell} ${styles.suggestion}`}>+{suggestedQuantity(product)}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${isOutOfStock ? styles.statusOut : styles.statusLow}`}>
@@ -275,9 +295,7 @@ export function ReplacementDashboard() {
                       </td>
                       <td>
                         <button
-                          ref={(element) => {
-                            if (selectedProduct?.id === product.id) actionTriggerRef.current = element;
-                          }}
+                          ref={selectedProduct?.id === product.id ? actionTriggerRef : undefined}
                           type="button"
                           className={styles.entryButton}
                           onClick={(event) => {
@@ -310,7 +328,7 @@ export function ReplacementDashboard() {
       )}
 
       <footer className={styles.footer}>
-        <p>Dados de exemplo. Entradas feitas aqui não são salvas no servidor.</p>
+        <p>As entradas de estoque são salvas no catálogo.</p>
       </footer>
       <p className={styles.srOnly} role="status" aria-live="polite">{announcement}</p>
 
