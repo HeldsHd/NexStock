@@ -1,12 +1,13 @@
 import type { SVGProps } from "react";
 
-type IconName = "grid" | "box" | "movements" | "menu" | "settings" | "user" | "sun" | "moon" | "monitor" | "search" | "bell" | "plus" | "close" | "check" | "eye" | "eye-off" | "arrow-right" | "chevron-down" | "edit" | "trash";
+type IconName = "grid" | "box" | "refresh" | "movements" | "menu" | "settings" | "user" | "sun" | "moon" | "monitor" | "search" | "bell" | "plus" | "close" | "check" | "eye" | "eye-off" | "arrow-right" | "chevron-down" | "edit" | "trash";
 
 type IconProps = SVGProps<SVGSVGElement> & { name: IconName };
 
 const paths: Record<IconName, React.ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
   box: <><path d="m12 3 9 5v8l-9 5-9-5V8l9-5Z" /><path d="m3 8 9 5 9-5M12 13v8M7.5 5.5l9 5" /></>,
+  refresh: <><path d="M20 7v5h-5" /><path d="M4.93 9A8 8 0 0 1 19 6l1 1M4 17v-5h5" /><path d="M19.07 15A8 8 0 0 1 5 18l-1-1" /></>,
   movements: <><path d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4" /></>,
   menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>,
   settings: <><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" /><path d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3.1 1.3v.2a1.8 1.8 0 0 1-3.6 0v-.2a1.8 1.8 0 0 0-3.1-1.3l-.1.1a1.8 1.8 0 0 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-1.3-3.1h-.2a1.8 1.8 0 0 1 0-3.6h.2a1.8 1.8 0 0 0 1.3-3.1l-.1-.1a1.8 1.8 0 0 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3.1-1.3v-.2a1.8 1.8 0 0 1 3.6 0v.2a1.8 1.8 0 0 0 3.1 1.3l.1-.1a1.8 1.8 0 0 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 1.3 3.1h.2a1.8 1.8 0 0 1 0 3.6h-.2a1.8 1.8 0 0 0-1.3 3.1Z" /></>,
