@@ -23,6 +23,12 @@ export function Navigation() {
             <span>Produtos</span>
           </Link>
         </li>
+        <li>
+          <Link href="/replacement" className={`navigation-link${pathname === "/replacement" ? " navigation-link--active" : ""}`} aria-current={pathname === "/replacement" ? "page" : undefined}>
+            <Icon name="refresh" />
+            <span>Reposição</span>
+          </Link>
+        </li>
         <li className="navigation-movements">
           <a href="#movimentacoes" className="navigation-link">
             <Icon name="movements" />
