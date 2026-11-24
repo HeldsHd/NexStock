@@ -1,0 +1,29 @@
+{
+  "name": "nexstock",
+  "version": "1.0.0",
+  "description": "![NexStoque logo](frontend/sources/titlepng.png)",
+  "main": "index.js",
+  
+"scripts": {
+  "dev": "concurrently --kill-others-on-fail --names BACKEND,FRONTEND \"npm run dev --prefix BackEnd\" \"npm run dev --prefix frontend\"",
+  "dev:backend": "npm run dev --prefix BackEnd",
+  "dev:frontend": "npm run dev --prefix frontend",
+  "setup": "npm ci --prefix BackEnd && npm ci --prefix frontend"
+},
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HeldsHd/NexStock.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HeldsHd/NexStock/issues"
+  },
+  "homepage": "https://github.com/HeldsHd/NexStock#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.7"
+  }
+}
