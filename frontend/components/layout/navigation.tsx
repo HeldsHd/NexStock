@@ -30,10 +30,10 @@ export function Navigation() {
           </Link>
         </li>
         <li className="navigation-movements">
-          <a href="#movimentacoes" className="navigation-link">
+          <Link href="/movement" className={`navigation-link${pathname === "/movement" ? " navigation-link--active" : ""}`} aria-current={pathname === "/movement" ? "page" : undefined}>
             <Icon name="movements" />
             <span>Movimentações</span>
-          </a>
+          </Link>
         </li>
         <li>
           <Link href="/systemConfig" className={`navigation-link${pathname === "/systemConfig" ? " navigation-link--active" : ""}`} aria-current={pathname === "/systemConfig" ? "page" : undefined}>

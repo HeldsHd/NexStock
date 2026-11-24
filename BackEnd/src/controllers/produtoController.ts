@@ -71,10 +71,24 @@ const produtoController = {
       }
 
       const resultado = await db.query(
-        `INSERT INTO produtos
-         (nome, codigo, preco_centavos, quantidade, quantidade_minima, categoria)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING *`,
+        `WITH produto_criado AS (
+           INSERT INTO produtos
+             (nome, codigo, preco_centavos, quantidade, quantidade_minima, categoria)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING *
+         ),
+         movimentacao AS (
+           INSERT INTO movimentacoes
+             (produto_id, produto_nome, produto_codigo, tipo, quantidade,
+              estoque_anterior, estoque_novo, usuario_nome)
+           SELECT id, nome, codigo, 'entrada', quantidade, 0, quantidade, $7
+           FROM produto_criado
+           WHERE quantidade > 0
+           RETURNING id
+         )
+         SELECT produto_criado.*
+         FROM produto_criado
+         LEFT JOIN movimentacao ON TRUE`,
         [
           nome.trim(),
           codigo.trim(),
@@ -82,6 +96,7 @@ const produtoController = {
           quantidade,
           quantidade_minima,
           categoriaNome,
+          req.session.usuarioNome?.trim() || "Usuário",
         ]
       );
 

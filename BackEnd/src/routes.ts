@@ -28,6 +28,7 @@ routes.delete("/produtos/:id", authentication, produtoController.delete);
 
 // Estoque
 routes.get("/estoque", authentication, estoqueController.list);
+routes.get("/estoque/movimentacoes", authentication, estoqueController.listMovements);
 routes.post("/estoque/entrada", authentication, estoqueController.entrada);
 routes.post("/estoque/saida", authentication, estoqueController.saida);
 

@@ -316,7 +316,6 @@
     gap: var(--space-4);
   }
 
-  .navigation-movements,
   .navigation-more-label {
     display: none;
   }

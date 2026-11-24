@@ -17,9 +17,15 @@ async function migrate() {
     );
     await db.query(minimumStockMigration);
 
+    const movementsMigration = await readFile(
+      resolve(process.cwd(), "migrations", "003_movimentacoes.sql"),
+      "utf8"
+    );
+    await db.query(movementsMigration);
+
     console.log("Migrações aplicadas com sucesso.");
   } catch (error) {
-    console.error("Erro ao aplicar a migração de categorias:", error);
+    console.error("Erro ao aplicar as migrações:", error);
     process.exitCode = 1;
   } finally {
     await db.end();
