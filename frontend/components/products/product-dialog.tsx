@@ -11,12 +11,13 @@ type ProductDialogProps = {
   product: CatalogProduct;
   mode: "edit" | "delete";
   products: CatalogProduct[];
+  categories: string[];
   onClose: () => void;
   onSaved: (product: CatalogProduct) => void;
   onDeleted: (id: number) => void;
 };
 
-export function ProductDialog({ product, mode, products, onClose, onSaved, onDeleted }: ProductDialogProps) {
+export function ProductDialog({ product, mode, products, categories, onClose, onSaved, onDeleted }: ProductDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formId = useId();
   const [saving, setSaving] = useState(false);
@@ -38,6 +39,7 @@ export function ProductDialog({ product, mode, products, onClose, onSaved, onDel
       name: String(data.get("name") ?? "").trim(),
       sku: String(data.get("sku") ?? "").trim().toLocaleUpperCase("pt-BR"),
       unitCost: Number(data.get("unitCost")),
+      category: String(data.get("category") ?? "").trim(),
     };
 
     if (!isDelete) {
@@ -95,6 +97,16 @@ export function ProductDialog({ product, mode, products, onClose, onSaved, onDel
             <fieldset className={styles.editFields} disabled={saving}>
               <Input label="Nome do produto" name="name" defaultValue={product.name} maxLength={100} required autoFocus />
               <Input label="Código do produto (SKU)" name="sku" defaultValue={product.sku} maxLength={40} autoCapitalize="characters" required />
+              <div className="form-field">
+                <label htmlFor={`${formId}-category`}>Categoria</label>
+                <select id={`${formId}-category`} name="category" defaultValue={product.category}>
+                  <option value="">Sem categoria</option>
+                  {product.category && !categories.includes(product.category) && (
+                    <option value={product.category}>{product.category}</option>
+                  )}
+                  {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+                </select>
+              </div>
               <Input label="Custo unitário (R$)" name="unitCost" type="number" defaultValue={product.unitCost} min="0" max="999999999" step="0.01" inputMode="decimal" required />
             </fieldset>
           )}

@@ -168,7 +168,7 @@
 
 .table {
   width: 100%;
-  min-width: 640px;
+  min-width: 760px;
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
@@ -189,19 +189,27 @@
 }
 
 .table thead th:first-child {
-  width: 40%;
+  width: 34%;
 }
 
 .table thead th:nth-child(2) {
-  width: 16%;
+  width: 14%;
 }
 
 .table thead th:nth-child(3) {
-  width: 30%;
+  width: 20%;
+}
+
+.table thead th:nth-child(4) {
+  width: 12%;
+}
+
+.table thead th:nth-child(5) {
+  width: 10%;
 }
 
 .table thead th:last-child {
-  width: 14%;
+  width: 10%;
 }
 
 .table tbody tr {
@@ -268,6 +276,12 @@
 
 .sku {
   overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.numericCell {
+  text-align: right;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 

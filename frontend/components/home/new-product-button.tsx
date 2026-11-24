@@ -1,25 +1,45 @@
 
 "use client";
 
-import { useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useInventory } from "@/components/home/inventory-provider";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { listCategories } from "@/lib/categories";
 import { productsApiUrl } from "@/lib/products";
 import type { Product } from "@/lib/dashboard";
 
 type NewProductButtonProps = {
   existingProducts?: Pick<Product, "sku">[];
+  categories?: string[];
   onCreated?: () => void;
   disabled?: boolean;
 };
 
-export function NewProductButton({ existingProducts, onCreated, disabled }: NewProductButtonProps = {}) {
+export function NewProductButton({ existingProducts, categories = [], onCreated, disabled }: NewProductButtonProps = {}) {
   const { products, addProduct } = useInventory();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [fetchedCategories, setFetchedCategories] = useState<string[]>([]);
+  const [categoryLoadError, setCategoryLoadError] = useState("");
   const formId = useId();
+  const availableCategories = categories ?? fetchedCategories;
+
+  useEffect(() => {
+    if (categories !== undefined) return;
+
+    const controller = new AbortController();
+    void listCategories(controller.signal)
+      .then(setFetchedCategories)
+      .catch((cause: unknown) => {
+        if (!controller.signal.aborted) {
+          setCategoryLoadError(cause instanceof Error ? cause.message : "Não foi possível carregar as categorias.");
+        }
+      });
+
+    return () => controller.abort();
+  }, [categories]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,6 +54,7 @@ export function NewProductButton({ existingProducts, onCreated, disabled }: NewP
       sku: String(data.get("sku") ?? "").trim().toUpperCase(),
       unitCost: Number(data.get("unitCost")),
       quantity: Number(data.get("quantity")),
+      category: String(data.get("category") ?? "").trim(),
     };
 
     if (!product.name || !product.sku) {
@@ -71,6 +92,7 @@ export function NewProductButton({ existingProducts, onCreated, disabled }: NewP
           codigo: product.sku,
           preco_centavos: Math.round(product.unitCost * 100),
           quantidade: product.quantity,
+          categoria: product.category,
         }),
       });
 
@@ -205,6 +227,17 @@ export function NewProductButton({ existingProducts, onCreated, disabled }: NewP
                 />
               </div>
             </div>
+
+            {availableCategories.length > 0 && (
+              <div className="form-field">
+                <label htmlFor={`${formId}-category`}>Categoria</label>
+                <select id={`${formId}-category`} name="category" defaultValue="">
+                  <option value="">Sem categoria</option>
+                  {availableCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+                </select>
+              </div>
+            )}
+            {categoryLoadError && <p className="form-error" role="alert">{categoryLoadError}</p>}
 
             {error && (
               <p

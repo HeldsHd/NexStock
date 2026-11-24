@@ -16,7 +16,8 @@ type ApiProduct = {
   descricao?: string | null;
 };
 
-export const productsApiUrl = `${(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(/\/$/, "")}/produtos`;
+export const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
+export const productsApiUrl = `${apiBaseUrl}/produtos`;
 
 function toCatalogProduct(product: ApiProduct): CatalogProduct {
   return {
@@ -30,7 +31,7 @@ function toCatalogProduct(product: ApiProduct): CatalogProduct {
   };
 }
 
-async function checkResponse(response: Response, fallback: string) {
+export async function checkResponse(response: Response, fallback: string) {
   if (response.ok) return;
 
   if (response.status === 401) {
@@ -66,6 +67,7 @@ export async function updateProduct(product: CatalogProduct): Promise<CatalogPro
       nome: product.name,
       codigo: product.sku,
       preco_centavos: Math.round(product.unitCost * 100),
+      categoria: product.category,
     }),
   });
   await checkResponse(response, "Não foi possível salvar o produto.");

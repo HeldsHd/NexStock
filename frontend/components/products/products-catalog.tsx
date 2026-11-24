@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { NewProductButton } from "@/components/home/new-product-button";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { listCategories } from "@/lib/categories";
 import { formatNumber } from "@/lib/dashboard";
 import { listProducts, type CatalogProduct } from "@/lib/products";
 import { ProductDialog } from "./product-dialog";
@@ -17,6 +18,7 @@ function normalize(value: string) {
 
 export function ProductsCatalog() {
   const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(true);
@@ -32,8 +34,14 @@ export function ProductsCatalog() {
 
     async function load() {
       try {
-        const result = await listProducts(controller.signal);
-        if (!controller.signal.aborted) setProducts(result);
+        const [result, categoryNames] = await Promise.all([
+          listProducts(controller.signal),
+          listCategories(controller.signal),
+        ]);
+        if (!controller.signal.aborted) {
+          setProducts(result);
+          setCategories(categoryNames);
+        }
       } catch (cause) {
         if (!controller.signal.aborted) {
           setError(cause instanceof TypeError ? "Não foi possível conectar ao servidor. Tente novamente." : cause instanceof Error ? cause.message : "Não foi possível carregar os produtos.");
@@ -53,7 +61,6 @@ export function ProductsCatalog() {
     setRevision((value) => value + 1);
   }
 
-  const categories = [...new Set(products.map((product) => product.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const normalizedQuery = normalize(query.trim());
   const filteredProducts = products.filter((product) =>
     (!category || (category === "uncategorized" ? !product.category : product.category === category)) &&
@@ -82,7 +89,7 @@ export function ProductsCatalog() {
           </div>
           <p className={styles.subtitle}>Organize e gerencie seu catálogo em um só lugar.</p>
         </div>
-        <NewProductButton existingProducts={products} onCreated={reload} disabled={loading || Boolean(error)} />
+        <NewProductButton existingProducts={products} categories={categories} onCreated={reload} disabled={loading || Boolean(error)} />
       </header>
 
       <div className={styles.filters}>
@@ -154,6 +161,7 @@ export function ProductsCatalog() {
           product={selected.product}
           mode={selected.mode}
           products={products}
+          categories={categories}
           onClose={() => closeDialog()}
           onSaved={(updated) => {
             setProducts((current) => current.map((product) => product.id === updated.id ? updated : product));

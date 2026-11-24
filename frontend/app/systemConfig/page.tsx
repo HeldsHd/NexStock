@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { InventoryProvider } from "@/components/home/inventory-provider";
 import { Header } from "@/components/layout/header";
 import { Navigation } from "@/components/layout/navigation";
+import { CategoriesSettings } from "@/components/config/categories-settings";
 import { useUserSettings } from "@/components/config/user-settings-provider";
 import { defaultUserSettings } from "@/components/config/user-settings";
 import { Icon } from "@/components/ui/icon";
@@ -171,10 +172,11 @@ export default function SystemConfigPage() {
             <header className="page-heading">
               <div>
                 <h1>Configurações</h1>
-                <p>Gerencie seu perfil e a aparência do NexStock.</p>
+                <p>Gerencie seu perfil, a aparência e as categorias do NexStock.</p>
               </div>
             </header>
             <SettingsForm />
+            <CategoriesSettings />
           </div>
         </main>
       </div>

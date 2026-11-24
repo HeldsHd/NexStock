@@ -43,10 +43,11 @@ Para iniciar o backend em modo de desenvolvimento, abra outro terminal:
 
 ```bash
 cd BackEnd
+npm run migrate
 npm run dev
 ```
 
-Acesse [http://localhost:3001](http://localhost:3001). A única rota, `GET /`, responde:
+Configure `DATABASE_URL` e `SESSION_SECRET` no arquivo `BackEnd/.env` antes de executar a migração. Ela cria a tabela de categorias, adiciona a categoria aos produtos e importa as categorias já existentes. Acesse [http://localhost:3001](http://localhost:3001). A rota `GET /` responde:
 
 ```json
 { "mensagem": "Servidor NexStock funcionando!" }
@@ -85,6 +86,7 @@ No diretório `BackEnd`:
 | Comando | Descrição |
 | --- | --- |
 | `npm run dev` | Executa o TypeScript e reinicia o servidor ao alterar o código. |
+| `npm run migrate` | Aplica a migração do catálogo de categorias no PostgreSQL. |
 | `npm run typecheck` | Verifica os tipos sem gerar arquivos. |
 | `npm run build` | Compila o TypeScript para a pasta `dist/`. |
 | `npm start` | Executa `dist/app.js` após o build. |

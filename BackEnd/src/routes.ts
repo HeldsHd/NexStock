@@ -2,6 +2,7 @@
 import { Router } from "express";
 
 import authController from "./controllers/authController.js";
+import categoriaController from "./controllers/categoriaController.js";
 import produtoController from "./controllers/produtoController.js";
 import estoqueController from "./controllers/estoqueController.js";
 
@@ -13,6 +14,10 @@ const routes = Router();
 routes.post("/login", authController.login);
 routes.get("/me", authentication, authController.me);
 routes.post("/logout", authentication, authController.logout);
+
+// Categorias
+routes.get("/categorias", authentication, categoriaController.list);
+routes.post("/categorias", authentication, categoriaController.create);
 
 // Produtos
 routes.get("/produtos", authentication, produtoController.list);

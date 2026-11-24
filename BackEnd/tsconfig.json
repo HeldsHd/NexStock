@@ -14,7 +14,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "seed.ts"
+    "seed.ts",
+    "migrate.ts"
   ],
   "exclude": [
     "node_modules",

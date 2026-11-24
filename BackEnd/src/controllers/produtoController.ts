@@ -37,7 +37,7 @@ const produtoController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { nome, codigo, preco_centavos, quantidade } = req.body;
+      const { nome, codigo, preco_centavos, quantidade, categoria } = req.body;
 
       if (
         typeof nome !== "string" ||
@@ -47,18 +47,39 @@ const produtoController = {
         !Number.isSafeInteger(preco_centavos) ||
         preco_centavos < 0 ||
         !Number.isSafeInteger(quantidade) ||
-        quantidade < 0
+        quantidade < 0 ||
+        (categoria !== undefined && typeof categoria !== "string") ||
+        (typeof categoria === "string" && categoria.trim().length > 80)
       ) {
         res.status(400).json({ erro: "Dados inválidos." });
         return;
       }
 
+      let categoriaNome = categoria?.trim() || null;
+      if (categoriaNome) {
+        const categoriaExistente = await db.query(
+          "SELECT nome FROM categorias WHERE LOWER(nome) = LOWER($1)",
+          [categoriaNome]
+        );
+        if (categoriaExistente.rowCount === 0) {
+          res.status(400).json({ erro: "A categoria selecionada não existe." });
+          return;
+        }
+        categoriaNome = categoriaExistente.rows[0].nome;
+      }
+
       const resultado = await db.query(
         `INSERT INTO produtos
-         (nome, codigo, preco_centavos, quantidade)
-         VALUES ($1, $2, $3, $4)
+         (nome, codigo, preco_centavos, quantidade, categoria)
+         VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [nome.trim(), codigo.trim(), preco_centavos, quantidade]
+        [
+          nome.trim(),
+          codigo.trim(),
+          preco_centavos,
+          quantidade,
+          categoriaNome,
+        ]
       );
 
       res.status(201).json(resultado.rows[0]);
@@ -75,7 +96,7 @@ const produtoController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { nome, codigo, preco_centavos } = req.body;
+      const { nome, codigo, preco_centavos, categoria } = req.body;
 
       if (
         typeof nome !== "string" ||
@@ -83,20 +104,46 @@ const produtoController = {
         typeof codigo !== "string" ||
         !codigo.trim() ||
         !Number.isSafeInteger(preco_centavos) ||
-        preco_centavos < 0
+        preco_centavos < 0 ||
+        (categoria !== undefined && typeof categoria !== "string") ||
+        (typeof categoria === "string" && categoria.trim().length > 80)
       ) {
         res.status(400).json({ erro: "Dados inválidos." });
         return;
+      }
+
+      let categoriaNome: string | null | undefined;
+      if (typeof categoria === "string") {
+        categoriaNome = categoria.trim() || null;
+        if (categoriaNome) {
+          const categoriaExistente = await db.query(
+            "SELECT nome FROM categorias WHERE LOWER(nome) = LOWER($1)",
+            [categoriaNome]
+          );
+          if (categoriaExistente.rowCount === 0) {
+            res.status(400).json({ erro: "A categoria selecionada não existe." });
+            return;
+          }
+          categoriaNome = categoriaExistente.rows[0].nome;
+        }
       }
 
       const resultado = await db.query(
         `UPDATE produtos
          SET nome = $1,
              codigo = $2,
-             preco_centavos = $3
-         WHERE id = $4
+             preco_centavos = $3,
+             categoria = CASE WHEN $4::boolean THEN $5::text ELSE categoria END
+         WHERE id = $6
          RETURNING *`,
-        [nome.trim(), codigo.trim(), preco_centavos, req.params.id]
+        [
+          nome.trim(),
+          codigo.trim(),
+          preco_centavos,
+          categoria !== undefined,
+          categoriaNome ?? null,
+          req.params.id,
+        ]
       );
 
       if (resultado.rowCount === 0) {
