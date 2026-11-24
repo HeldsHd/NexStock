@@ -71,7 +71,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       !Number.isSafeInteger(product.minimumStock) ||
       product.minimumStock < 0
     ) {
-      setError("Informe um custo e uma quantidade válidos.");
+      setError("Informe um custo e quantidades válidos.");
       return;
     }
 
