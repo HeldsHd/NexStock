@@ -16,7 +16,7 @@ type NewProductButtonProps = {
   disabled?: boolean;
 };
 
-export function NewProductButton({ existingProducts, categories = [], onCreated, disabled }: NewProductButtonProps = {}) {
+export function NewProductButton({ existingProducts, categories, onCreated, disabled }: NewProductButtonProps = {}) {
   const { products, addProduct } = useInventory();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState("");
