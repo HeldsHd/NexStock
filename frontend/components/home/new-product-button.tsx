@@ -54,6 +54,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       sku: String(data.get("sku") ?? "").trim().toUpperCase(),
       unitCost: Number(data.get("unitCost")),
       quantity: Number(data.get("quantity")),
+      minimumStock: Number(data.get("minimumStock")),
       category: String(data.get("category") ?? "").trim(),
     };
 
@@ -66,7 +67,9 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       !Number.isFinite(product.unitCost) ||
       product.unitCost < 0 ||
       !Number.isSafeInteger(product.quantity) ||
-      product.quantity < 0
+      product.quantity < 0 ||
+      !Number.isSafeInteger(product.minimumStock) ||
+      product.minimumStock < 0
     ) {
       setError("Informe um custo e uma quantidade válidos.");
       return;
@@ -92,6 +95,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
           codigo: product.sku,
           preco_centavos: Math.round(product.unitCost * 100),
           quantidade: product.quantity,
+          quantidade_minima: product.minimumStock,
           categoria: product.category,
         }),
       });
@@ -226,6 +230,23 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
                   required
                 />
               </div>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor={`${formId}-minimum-stock`}>
+                Quantidade mínima em estoque
+              </label>
+              <input
+                id={`${formId}-minimum-stock`}
+                name="minimumStock"
+                type="number"
+                min="0"
+                max="999999"
+                step="1"
+                placeholder="0"
+                inputMode="numeric"
+                required
+              />
             </div>
 
             {availableCategories.length > 0 && (

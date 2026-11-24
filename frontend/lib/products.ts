@@ -4,6 +4,7 @@ export type CatalogProduct = Product & {
   id: number;
   category: string;
   description: string;
+  minimumStock: number;
 };
 
 type ApiProduct = {
@@ -12,6 +13,7 @@ type ApiProduct = {
   codigo?: string | null;
   preco_centavos?: number | string | null;
   quantidade?: number | null;
+  quantidade_minima?: number | null;
   categoria?: string | null;
   descricao?: string | null;
 };
@@ -26,6 +28,7 @@ function toCatalogProduct(product: ApiProduct): CatalogProduct {
     sku: product.codigo?.trim() ?? "",
     unitCost: Number(product.preco_centavos ?? 0) / 100,
     quantity: product.quantidade ?? 0,
+    minimumStock: product.quantidade_minima ?? 0,
     category: product.categoria?.trim() ?? "",
     description: product.descricao?.trim() ?? "",
   };
@@ -67,6 +70,7 @@ export async function updateProduct(product: CatalogProduct): Promise<CatalogPro
       nome: product.name,
       codigo: product.sku,
       preco_centavos: Math.round(product.unitCost * 100),
+      quantidade_minima: product.minimumStock,
       categoria: product.category,
     }),
   });
@@ -80,4 +84,20 @@ export async function deleteProduct(id: number): Promise<void> {
     credentials: "include",
   });
   await checkResponse(response, "Não foi possível excluir o produto.");
+}
+
+export async function restockProduct(id: number, quantity: number): Promise<CatalogProduct> {
+  const response = await fetch(`${apiBaseUrl}/estoque/entrada`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ produtoId: id, quantidade: quantity }),
+  });
+  await checkResponse(response, "Não foi possível adicionar unidades ao estoque.");
+
+  const result = await response.json();
+  if (!result?.produto) {
+    throw new Error("O servidor não retornou o produto atualizado.");
+  }
+  return toCatalogProduct(result.produto);
 }

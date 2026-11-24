@@ -25,7 +25,7 @@ export function ProductsCatalog() {
   const [error, setError] = useState("");
   const [announcement, setAnnouncement] = useState("");
   const [revision, setRevision] = useState(0);
-  const [selected, setSelected] = useState<{ product: CatalogProduct; mode: "edit" | "delete" } | null>(null);
+  const [selected, setSelected] = useState<{ product: CatalogProduct; mode: "edit" | "delete" | "restock" } | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const actionTriggerRef = useRef<HTMLButtonElement | null>(null);
 

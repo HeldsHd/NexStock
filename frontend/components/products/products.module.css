@@ -168,7 +168,7 @@
 
 .table {
   width: 100%;
-  min-width: 760px;
+  min-width: 920px;
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
@@ -287,6 +287,31 @@
 
 .missing {
   color: var(--color-text-muted);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
+.statusAvailable {
+  background: color-mix(in srgb, #22a06b 16%, var(--color-surface));
+  color: #16794d;
+}
+
+.statusLow {
+  background: color-mix(in srgb, #d97706 16%, var(--color-surface));
+  color: #a85a00;
+}
+
+.statusOut {
+  background: color-mix(in srgb, #dc2626 16%, var(--color-surface));
+  color: #b42318;
 }
 
 .rowActions {

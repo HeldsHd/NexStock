@@ -3,6 +3,7 @@ export type Product = {
   sku: string;
   unitCost: number;
   quantity: number;
+  minimumStock?: number;
 };
 
 // Dados de demonstração da home, até a integração com a API de estoque.

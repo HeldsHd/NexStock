@@ -5,12 +5,19 @@ import { db } from "./src/db.js";
 
 async function migrate() {
   try {
-    const migration = await readFile(
+    const categoriesMigration = await readFile(
       resolve(process.cwd(), "migrations", "001_categories.sql"),
       "utf8"
     );
-    await db.query(migration);
-    console.log("Migração de categorias aplicada com sucesso.");
+    await db.query(categoriesMigration);
+
+    const minimumStockMigration = await readFile(
+      resolve(process.cwd(), "migrations", "002_minimum_stock.sql"),
+      "utf8"
+    );
+    await db.query(minimumStockMigration);
+
+    console.log("Migrações aplicadas com sucesso.");
   } catch (error) {
     console.error("Erro ao aplicar a migração de categorias:", error);
     process.exitCode = 1;

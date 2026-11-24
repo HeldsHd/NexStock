@@ -37,7 +37,7 @@ const produtoController = {
 
   async create(req: Request, res: Response) {
     try {
-      const { nome, codigo, preco_centavos, quantidade, categoria } = req.body;
+      const { nome, codigo, preco_centavos, quantidade, quantidade_minima, categoria } = req.body;
 
       if (
         typeof nome !== "string" ||
@@ -48,6 +48,8 @@ const produtoController = {
         preco_centavos < 0 ||
         !Number.isSafeInteger(quantidade) ||
         quantidade < 0 ||
+        !Number.isSafeInteger(quantidade_minima) ||
+        quantidade_minima < 0 ||
         (categoria !== undefined && typeof categoria !== "string") ||
         (typeof categoria === "string" && categoria.trim().length > 80)
       ) {
@@ -70,14 +72,15 @@ const produtoController = {
 
       const resultado = await db.query(
         `INSERT INTO produtos
-         (nome, codigo, preco_centavos, quantidade, categoria)
-         VALUES ($1, $2, $3, $4, $5)
+         (nome, codigo, preco_centavos, quantidade, quantidade_minima, categoria)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
         [
           nome.trim(),
           codigo.trim(),
           preco_centavos,
           quantidade,
+          quantidade_minima,
           categoriaNome,
         ]
       );
@@ -96,7 +99,7 @@ const produtoController = {
 
   async update(req: Request, res: Response) {
     try {
-      const { nome, codigo, preco_centavos, categoria } = req.body;
+      const { nome, codigo, preco_centavos, categoria, quantidade_minima } = req.body;
 
       if (
         typeof nome !== "string" ||
@@ -105,6 +108,8 @@ const produtoController = {
         !codigo.trim() ||
         !Number.isSafeInteger(preco_centavos) ||
         preco_centavos < 0 ||
+        !Number.isSafeInteger(quantidade_minima) ||
+        quantidade_minima < 0 ||
         (categoria !== undefined && typeof categoria !== "string") ||
         (typeof categoria === "string" && categoria.trim().length > 80)
       ) {
@@ -133,13 +138,15 @@ const produtoController = {
          SET nome = $1,
              codigo = $2,
              preco_centavos = $3,
-             categoria = CASE WHEN $4::boolean THEN $5::text ELSE categoria END
-         WHERE id = $6
+             quantidade_minima = $4,
+             categoria = CASE WHEN $5::boolean THEN $6::text ELSE categoria END
+         WHERE id = $7
          RETURNING *`,
         [
           nome.trim(),
           codigo.trim(),
           preco_centavos,
+          quantidade_minima,
           categoria !== undefined,
           categoriaNome ?? null,
           req.params.id,
