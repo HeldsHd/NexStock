@@ -66,9 +66,9 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       !Number.isFinite(product.unitCost) ||
       product.unitCost < 0 ||
       !Number.isSafeInteger(product.quantity) ||
-      product.quantity < 0
+      product.quantity < 1
     ) {
-      setError("Informe um custo e uma quantidade válidos.");
+      setError("Informe um custo válido e uma quantidade mínima de 1.");
       return;
     }
 
@@ -218,7 +218,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
                   id={`${formId}-quantity`}
                   name="quantity"
                   type="number"
-                  min="0"
+                  min="1"
                   max="999999"
                   step="1"
                   placeholder="0"

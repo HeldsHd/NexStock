@@ -47,7 +47,7 @@ const produtoController = {
         !Number.isSafeInteger(preco_centavos) ||
         preco_centavos < 0 ||
         !Number.isSafeInteger(quantidade) ||
-        quantidade < 0 ||
+        quantidade < 1 ||
         (categoria !== undefined && typeof categoria !== "string") ||
         (typeof categoria === "string" && categoria.trim().length > 80)
       ) {
