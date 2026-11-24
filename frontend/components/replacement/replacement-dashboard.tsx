@@ -161,19 +161,6 @@ export function ReplacementDashboard() {
     requestAnimationFrame(() => actionTriggerRef.current?.focus());
   }
 
-  async function copyPurchaseList() {
-    const purchaseList = filteredProducts
-      .map((product) => `${product.name} (${product.sku}) - ${suggestedQuantity(product)} un.`)
-      .join("\n");
-
-    try {
-      await navigator.clipboard.writeText(purchaseList);
-      setAnnouncement("Lista de compra copiada.");
-    } catch {
-      setAnnouncement("Não foi possível copiar a lista. Verifique a permissão de área de transferência do navegador.");
-    }
-  }
-
   async function registerEntry(product: CatalogProduct, received: number) {
     const updated = await restockProduct(product.id, received);
     setProducts((current) => current.map((item) => item.id === updated.id ? updated : item));
@@ -191,14 +178,6 @@ export function ReplacementDashboard() {
           </div>
           <p className={styles.subtitle}>Veja o que precisa ser comprado e dê entrada quando chegar.</p>
         </div>
-        <button
-          type="button"
-          className={`button button--primary ${styles.copyButton}`}
-          onClick={() => void copyPurchaseList()}
-          disabled={loading || Boolean(error) || filteredProducts.length === 0}
-        >
-          Copiar lista de compra
-        </button>
       </header>
 
       <div className={styles.filters}>
