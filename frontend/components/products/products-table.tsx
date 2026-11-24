@@ -9,7 +9,7 @@ type ProductsTableProps = {
   loading: boolean;
   hasFilters: boolean;
   onClearFilters: () => void;
-  onAction: (product: CatalogProduct, mode: "edit" | "delete" | "restock", trigger: HTMLButtonElement) => void;
+  onAction: (product: CatalogProduct, mode: "edit" | "delete" | "restock" | "withdraw", trigger: HTMLButtonElement) => void;
 };
 
 export function ProductsTable({ products, loading, hasFilters, onClearFilters, onAction }: ProductsTableProps) {
@@ -67,6 +67,9 @@ export function ProductsTable({ products, loading, hasFilters, onClearFilters, o
                   <div className={styles.rowActions}>
                     <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Repor estoque de ${product.name}`} title={`Repor estoque de ${product.name}`} onClick={(event) => onAction(product, "restock", event.currentTarget)}>
                       <Icon name="plus" />
+                    </button>
+                    <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Registrar saída de ${product.name}`} title={`Registrar saída de ${product.name}`} disabled={product.quantity === 0} onClick={(event) => onAction(product, "withdraw", event.currentTarget)}>
+                      <Icon name="movements" />
                     </button>
                     <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Editar ${product.name}`} title={`Editar ${product.name}`} onClick={(event) => onAction(product, "edit", event.currentTarget)}>
                       <Icon name="edit" />

@@ -408,6 +408,132 @@
   border: 0;
 }
 
+.stockMovementSummary {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.stockMovementSummary div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.stockMovementSummary span,
+.movementPreview span {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.stockMovementSummary strong {
+  color: var(--color-primary);
+  font-size: var(--text-xl);
+  font-variant-numeric: tabular-nums;
+}
+
+.stockMovementSummary > svg {
+  color: var(--color-text-muted);
+}
+
+.quantitySelector {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.quantitySelector > label {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.quantityControl {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  min-height: 56px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.quantityControl input {
+  min-width: 0;
+  border: 0;
+  border-inline: 1px solid var(--color-border);
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.quantityButton {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: var(--text-xl);
+  cursor: pointer;
+}
+
+.quantityButton:disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.quickQuantities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.quickQuantity,
+.quickQuantityActive {
+  min-height: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.quickQuantityActive {
+  border-color: var(--color-primary);
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.movementPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+}
+
+.movementPreview strong {
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+}
+
+.withdrawNote {
+  margin: 0;
+  color: var(--color-warning);
+  font-size: var(--text-sm);
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

@@ -101,3 +101,19 @@ export async function restockProduct(id: number, quantity: number): Promise<Cata
   }
   return toCatalogProduct(result.produto);
 }
+
+export async function removeStock(id: number, quantity: number): Promise<CatalogProduct> {
+  const response = await fetch(`${apiBaseUrl}/estoque/saida`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ produtoId: id, quantidade: quantity }),
+  });
+  await checkResponse(response, "Não foi possível registrar a saída do estoque.");
+
+  const result = await response.json();
+  if (!result?.produto) {
+    throw new Error("O servidor não retornou o produto atualizado.");
+  }
+  return toCatalogProduct(result.produto);
+}
