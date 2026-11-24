@@ -1,0 +1,72 @@
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import type { CatalogProduct } from "@/lib/products";
+import styles from "./products.module.css";
+
+type ProductsTableProps = {
+  products: CatalogProduct[];
+  loading: boolean;
+  hasFilters: boolean;
+  onClearFilters: () => void;
+  onAction: (product: CatalogProduct, mode: "edit" | "delete", trigger: HTMLButtonElement) => void;
+};
+
+export function ProductsTable({ products, loading, hasFilters, onClearFilters, onAction }: ProductsTableProps) {
+  return (
+    <div className={styles.tableContainer}>
+      <div className={styles.tableScroll} tabIndex={0} role="region" aria-label="Tabela de produtos; role horizontalmente para ver todas as colunas">
+        <table className={styles.table} aria-busy={loading}>
+          <caption className={styles.srOnly}>Catálogo de produtos, códigos, categorias e ações</caption>
+          <thead>
+            <tr>
+              <th scope="col">Produto</th>
+              <th scope="col">SKU</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={4} className={styles.tableState}><p role="status">Carregando produtos...</p></td></tr>
+            ) : products.length ? products.map((product, index) => (
+              <tr key={product.id}>
+                <th scope="row">
+                  <div className={styles.productCell}>
+                    <span className={styles.productNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                    <div className={styles.productDetails}>
+                      <span className={styles.productName}>{product.name}</span>
+                      <span className={styles.productDescription}>{product.description || "Dados não informados"}</span>
+                    </div>
+                  </div>
+                </th>
+                <td><span className={product.sku ? styles.sku : styles.missing}>{product.sku || "—"}</span></td>
+                <td><span className={product.category ? undefined : styles.missing}>{product.category || "—"}</span></td>
+                <td>
+                  <div className={styles.rowActions}>
+                    <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Editar ${product.name}`} title={`Editar ${product.name}`} onClick={(event) => onAction(product, "edit", event.currentTarget)}>
+                      <Icon name="edit" />
+                    </button>
+                    <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Excluir ${product.name}`} title={`Excluir ${product.name}`} onClick={(event) => onAction(product, "delete", event.currentTarget)}>
+                      <Icon name="trash" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={4}>
+                  <div className={styles.emptyState}>
+                    <Icon name={hasFilters ? "search" : "box"} />
+                    <h3>{hasFilters ? "Nenhum produto encontrado" : "Seu catálogo está vazio"}</h3>
+                    <p>{hasFilters ? "Tente outro nome, SKU ou categoria." : "Clique em Novo produto para cadastrar seu primeiro item."}</p>
+                    {hasFilters && <Button variant="secondary" onClick={onClearFilters}>Limpar filtros</Button>}
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

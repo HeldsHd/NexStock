@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-type IconName = "grid" | "box" | "movements" | "menu" | "settings" | "user" | "sun" | "moon" | "monitor" | "search" | "bell" | "plus" | "close" | "check" | "eye" | "eye-off" | "arrow-right";
+type IconName = "grid" | "box" | "movements" | "menu" | "settings" | "user" | "sun" | "moon" | "monitor" | "search" | "bell" | "plus" | "close" | "check" | "eye" | "eye-off" | "arrow-right" | "chevron-down" | "edit" | "trash";
 
 type IconProps = SVGProps<SVGSVGElement> & { name: IconName };
 
@@ -22,6 +22,9 @@ const paths: Record<IconName, React.ReactNode> = {
   eye: <><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="2.5" /></>,
   "eye-off": <><path d="m3 3 18 18M10.6 6.1A12 12 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.1 3.6M6.3 6.3A17.8 17.8 0 0 0 2 12s3.5 6 10 6a12.7 12.7 0 0 0 5.2-1.1M10.2 10.2a2.5 2.5 0 0 0 3.6 3.6" /></>,
   "arrow-right": <path d="M4 12h16m-6-6 6 6-6 6" />,
+  "chevron-down": <path d="m6 9 6 6 6-6" />,
+  edit: <><path d="M12 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-7" /><path d="m16 3 5 5M10 17l-5 2 2-5L18 3a2.1 2.1 0 0 1 3 3L10 17Z" /></>,
+  trash: <><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></>,
 };
 
 export function Icon({ name, ...props }: IconProps) {

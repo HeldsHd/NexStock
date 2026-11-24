@@ -18,10 +18,10 @@ export function Navigation() {
           </Link>
         </li>
         <li>
-          <button className="navigation-link" type="button" disabled title="A página de produtos estará disponível em breve">
+          <Link href="/Stock" className={`navigation-link${pathname === "/Stock" ? " navigation-link--active" : ""}`} aria-current={pathname === "/Stock" ? "page" : undefined}>
             <Icon name="box" />
             <span>Produtos</span>
-          </button>
+          </Link>
         </li>
         <li className="navigation-movements">
           <a href="#movimentacoes" className="navigation-link">

@@ -5,8 +5,16 @@ import { useId, useRef, useState, type FormEvent } from "react";
 import { useInventory } from "@/components/home/inventory-provider";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { productsApiUrl } from "@/lib/products";
+import type { Product } from "@/lib/dashboard";
 
-export function NewProductButton() {
+type NewProductButtonProps = {
+  existingProducts?: Pick<Product, "sku">[];
+  onCreated?: () => void;
+  disabled?: boolean;
+};
+
+export function NewProductButton({ existingProducts, onCreated, disabled }: NewProductButtonProps = {}) {
   const { products, addProduct } = useInventory();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState("");
@@ -43,7 +51,7 @@ export function NewProductButton() {
       return;
     }
 
-    if (products.some((existing) => existing.sku === product.sku)) {
+    if ((existingProducts ?? products).some((existing) => existing.sku.toLocaleUpperCase("pt-BR") === product.sku)) {
       setError("Já existe um produto com este código.");
       return;
     }
@@ -52,7 +60,7 @@ export function NewProductButton() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3001/produtos", {
+      const response = await fetch(productsApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,6 +82,7 @@ export function NewProductButton() {
       }
 
       addProduct(product);
+      onCreated?.();
 
       form.reset();
       dialogRef.current?.close();
@@ -89,6 +98,7 @@ export function NewProductButton() {
     <>
       <Button
         className="new-product-button"
+        disabled={disabled}
         onClick={() => {
           setError("");
           dialogRef.current?.showModal();
