@@ -249,13 +249,13 @@ export function ReplacementDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((product) => {
+                {filteredProducts.map((product, index) => {
                   const isOutOfStock = product.quantity === 0;
                   return (
                     <tr key={product.id}>
                       <th scope="row">
                         <div className={styles.productCell}>
-                          <span className={styles.productNumber}>{String(product.id).padStart(2, "0")}</span>
+                          <span className={styles.productNumber}>{String(index + 1).padStart(2, "0")}</span>
                           <span className={styles.productDetails}>
                             <span className={styles.productName}>{product.name}</span>
                             <span className={styles.productDescription}>{formatCurrency(product.unitCost)} por unidade</span>
