@@ -254,6 +254,11 @@
 }
 
 @media (max-width: 1199px) {
+  .tableContainer {
+    overflow: visible;
+    border: 0;
+  }
+
   .tableScroll {
     overflow: visible;
   }
@@ -269,7 +274,7 @@
 
   .table tbody {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .table tbody tr {
@@ -279,15 +284,18 @@
       "product product"
       "type quantity"
       "stock stock"
-      "date date"
-      "responsible responsible";
+      "date responsible";
     overflow: hidden;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+    background: var(--color-surface);
   }
 
   .table tbody th {
     grid-area: product;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
   }
 
   .table tbody th,
@@ -329,11 +337,30 @@
 
   .table .numericCell {
     white-space: normal;
+    text-align: left;
   }
 
   .table .typeBadge {
     justify-self: start;
     width: fit-content;
     max-width: 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summaryCard:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .summaryCard {
+    padding: var(--space-3);
+  }
+
+  .summaryCard strong {
+    font-size: var(--text-base);
   }
 }
