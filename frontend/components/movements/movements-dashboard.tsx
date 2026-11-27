@@ -112,21 +112,21 @@ export function MovementsDashboard() {
               <tbody>
                 {movements.map((movement) => (
                   <tr key={movement.id}>
-                    <td>{dateTimeFormat.format(new Date(movement.createdAt))}</td>
+                    <td data-label="Data e hora">{dateTimeFormat.format(new Date(movement.createdAt))}</td>
                     <th scope="row">
                       <span className={styles.productName}>{movement.productName}</span>
                       <span className={styles.productSku}>{movement.productSku || "Sem SKU"}</span>
                     </th>
-                    <td>
+                    <td data-label="Tipo">
                       <span className={`${styles.typeBadge} ${movement.type === "entrada" ? styles.incoming : styles.outgoing}`}>
                         {movement.type === "entrada" ? "Entrada" : "Saída"}
                       </span>
                     </td>
-                    <td className={styles.numericCell}>{formatNumber(movement.quantity)}</td>
-                    <td className={styles.numericCell}>
+                    <td data-label="Quantidade" className={styles.numericCell}>{formatNumber(movement.quantity)}</td>
+                    <td data-label="Estoque" className={styles.numericCell}>
                       {formatNumber(movement.previousStock)} <span aria-hidden="true">→</span> {formatNumber(movement.currentStock)}
                     </td>
-                    <td>{movement.userName}</td>
+                    <td data-label="Responsável">{movement.userName}</td>
                   </tr>
                 ))}
               </tbody>

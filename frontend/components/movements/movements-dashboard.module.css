@@ -165,19 +165,20 @@
 
 .typeBadge {
   display: inline-flex;
+  align-items: center;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
 }
 
 .incoming {
-  background: #15724755;
-  color: #43d995;
+  background: var(--color-status-success-background);
+  color: var(--color-status-success-text);
 }
 
 .outgoing {
-  background: #7d253b55;
-  color: #ff647b;
+  background: var(--color-status-danger-background);
+  color: var(--color-status-danger-text);
 }
 
 .state {
@@ -249,5 +250,90 @@
   .table tbody th,
   .table tbody td {
     padding-inline: var(--space-5);
+  }
+}
+
+@media (max-width: 1199px) {
+  .tableScroll {
+    overflow: visible;
+  }
+
+  .table {
+    display: block;
+    min-width: 0;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "product product"
+      "type quantity"
+      "stock stock"
+      "date date"
+      "responsible responsible";
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .table tbody th {
+    grid-area: product;
+  }
+
+  .table tbody th,
+  .table tbody td {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    min-width: 0;
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .table tbody td[data-label="Data e hora"] {
+    grid-area: date;
+  }
+
+  .table tbody td[data-label="Tipo"] {
+    grid-area: type;
+  }
+
+  .table tbody td[data-label="Quantidade"] {
+    grid-area: quantity;
+  }
+
+  .table tbody td[data-label="Estoque"] {
+    grid-area: stock;
+  }
+
+  .table tbody td[data-label="Responsável"] {
+    grid-area: responsible;
+  }
+
+  .table tbody td::before {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    content: attr(data-label);
+  }
+
+  .table .numericCell {
+    white-space: normal;
+  }
+
+  .table .typeBadge {
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
   }
 }

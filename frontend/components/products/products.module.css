@@ -885,6 +885,12 @@
     text-align: left;
   }
 
+  .table .statusBadge {
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .rowActions {
     flex-wrap: wrap;
   }

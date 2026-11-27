@@ -276,13 +276,13 @@
 }
 
 .statusOut {
-  background: #7d253b55;
-  color: #ff647b;
+  background: color-mix(in srgb, #dc2626 12%, var(--color-surface));
+  color: color-mix(in srgb, #dc2626 55%, var(--color-text));
 }
 
 .statusLow {
-  background: #875b1d55;
-  color: #ffbd36;
+  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface));
+  color: var(--color-warning);
 }
 
 .entryButton {
