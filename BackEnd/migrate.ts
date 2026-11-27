@@ -23,6 +23,24 @@ async function migrate() {
     );
     await db.query(movementsMigration);
 
+    const productCardMigration = await readFile(
+      resolve(process.cwd(), "migrations", "004_product_card_details.sql"),
+      "utf8"
+    );
+    await db.query(productCardMigration);
+
+    const productImagesMigration = await readFile(
+      resolve(process.cwd(), "migrations", "005_product_images.sql"),
+      "utf8"
+    );
+    await db.query(productImagesMigration);
+
+    const productImageVersionMigration = await readFile(
+      resolve(process.cwd(), "migrations", "006_product_image_version.sql"),
+      "utf8"
+    );
+    await db.query(productImageVersionMigration);
+
     console.log("Migrações aplicadas com sucesso.");
   } catch (error) {
     console.error("Erro ao aplicar as migrações:", error);

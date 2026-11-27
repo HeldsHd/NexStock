@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
 import Input from "@/components/input";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { deleteProduct, removeStock, restockProduct, updateProduct, type CatalogProduct } from "@/lib/products";
+import { acceptedProductImageTypes, maximumProductImageSize, readProductImageAsDataUrl } from "@/lib/product-image";
+import { apiBaseUrl, deleteProduct, removeStock, restockProduct, updateProduct, type CatalogProduct } from "@/lib/products";
 import styles from "./products.module.css";
 
 type ProductDialogProps = {
@@ -23,6 +25,7 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [movementQuantity, setMovementQuantity] = useState(1);
+  const [newImageUrl, setNewImageUrl] = useState("");
   const isDelete = mode === "delete";
   const isRestock = mode === "restock";
   const isWithdraw = mode === "withdraw";
@@ -47,6 +50,9 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
 
     setError("");
     const data = new FormData(event.currentTarget);
+    const imageValue = data.get("imageFile");
+    const imageFile = imageValue instanceof File && imageValue.size > 0 ? imageValue : null;
+    const imageLink = String(data.get("imageUrl") ?? "").trim();
     const updated = {
       ...product,
       name: String(data.get("name") ?? "").trim(),
@@ -54,6 +60,7 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
       unitCost: Number(data.get("unitCost")),
       minimumStock: Number(data.get("minimumStock")),
       category: String(data.get("category") ?? "").trim(),
+      supplier: String(data.get("supplier") ?? "").trim(),
     };
 
     if (isMovement) {
@@ -109,6 +116,14 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
         setError("Já existe um produto com este código.");
         return;
       }
+      if (imageFile && !acceptedProductImageTypes.includes(imageFile.type)) {
+        setError("A imagem deve estar no formato JPG, PNG ou WebP.");
+        return;
+      }
+      if (imageFile && imageFile.size > maximumProductImageSize) {
+        setError("A imagem deve ter no máximo 3 MB.");
+        return;
+      }
     }
 
     setSaving(true);
@@ -117,7 +132,12 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
         await deleteProduct(product.id);
         onDeleted(product.id);
       } else {
-        const result = await updateProduct(updated);
+        const imageUpdate = imageFile
+          ? { dataUrl: await readProductImageAsDataUrl(imageFile) }
+          : imageLink
+            ? { url: imageLink }
+            : undefined;
+        const result = await updateProduct(updated, imageUpdate);
         onSaved(result);
       }
     } catch (cause) {
@@ -243,6 +263,43 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
             <fieldset className={styles.editFields} disabled={saving}>
               <Input label="Nome do produto" name="name" defaultValue={product.name} maxLength={100} required autoFocus />
               <Input label="Código do produto (SKU)" name="sku" defaultValue={product.sku} maxLength={40} autoCapitalize="characters" required />
+              <div className={styles.imageEditor}>
+                <span>Foto atual</span>
+                {product.imageUrl ? (
+                  <Image
+                    src={product.imageUrl}
+                    alt={`Foto atual de ${product.name}`}
+                    width={96}
+                    height={96}
+                    className={styles.editImagePreview}
+                    unoptimized
+                    crossOrigin={product.imageUrl.startsWith(`${apiBaseUrl}/produtos/`) ? "use-credentials" : undefined}
+                  />
+                ) : (
+                  <span className={styles.noProductImage}>Nenhuma foto cadastrada</span>
+                )}
+              </div>
+              <div className="form-field">
+                <label htmlFor={`${formId}-image-file`}>Escolher nova foto (JPG, PNG ou WebP; até 3 MB)</label>
+                <input
+                  id={`${formId}-image-file`}
+                  name="imageFile"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor={`${formId}-image-url`}>Ou informar URL da nova foto (arquivo tem prioridade)</label>
+                <input
+                  id={`${formId}-image-url`}
+                  name="imageUrl"
+                  type="text"
+                  maxLength={2048}
+                  placeholder="https://exemplo.com/camisa.jpg"
+                  value={newImageUrl}
+                  onChange={(event) => setNewImageUrl(event.target.value)}
+                />
+              </div>
               <div className="form-field">
                 <label htmlFor={`${formId}-category`}>Categoria</label>
                 <select id={`${formId}-category`} name="category" defaultValue={product.category}>
@@ -253,6 +310,7 @@ export function ProductDialog({ product, mode, products, categories, onClose, on
                   {categories.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
               </div>
+              <Input label="Fornecedor" name="supplier" defaultValue={product.supplier} maxLength={160} />
               <Input label="Custo unitário (R$)" name="unitCost" type="number" defaultValue={product.unitCost} min="0" max="999999999" step="0.01" inputMode="decimal" required />
               <Input label="Quantidade mínima em estoque" name="minimumStock" type="number" defaultValue={product.minimumStock} min="0" max="999999" step="1" inputMode="numeric" required />
             </fieldset>

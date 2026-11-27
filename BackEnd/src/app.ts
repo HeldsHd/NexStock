@@ -1,7 +1,7 @@
 
 import "dotenv/config";
 import cors from "cors";
-import express from "express";
+import express, { type ErrorRequestHandler } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 
@@ -35,8 +35,8 @@ app.use(
   })
 );
 
-// Permitir receber JSON
-app.use(express.json());
+// Imagens de produto são enviadas como data URL, com limite para evitar payloads grandes.
+app.use(express.json({ limit: "5mb" }));
 
 // Configurar sessões
 app.use(
@@ -64,5 +64,15 @@ app.use(
 
 // Registrar as rotas
 app.use(routes);
+
+const jsonErrorHandler: ErrorRequestHandler = (error, _req, res, next) => {
+  if (typeof error === "object" && error !== null && "type" in error && error.type === "entity.too.large") {
+    res.status(413).json({ erro: "O arquivo enviado excede o limite de 3 MB." });
+    return;
+  }
+  next(error);
+};
+
+app.use(jsonErrorHandler);
 
 export default app;

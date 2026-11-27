@@ -6,6 +6,7 @@ import { useInventory } from "@/components/home/inventory-provider";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { listCategories } from "@/lib/categories";
+import { acceptedProductImageTypes, maximumProductImageSize, readProductImageAsDataUrl } from "@/lib/product-image";
 import { productsApiUrl } from "@/lib/products";
 import type { Product } from "@/lib/dashboard";
 
@@ -23,6 +24,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
   const [saving, setSaving] = useState(false);
   const [fetchedCategories, setFetchedCategories] = useState<string[]>([]);
   const [categoryLoadError, setCategoryLoadError] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const formId = useId();
   const availableCategories = categories ?? fetchedCategories;
 
@@ -48,6 +50,10 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
 
     const form = event.currentTarget;
     const data = new FormData(form);
+    const imageValue = data.get("imageFile");
+    const imageFile = imageValue instanceof File && imageValue.size > 0 ? imageValue : null;
+    const imageLink = String(data.get("imageUrl") ?? "").trim();
+    const imageLinkToSave = imageFile ? null : imageLink || null;
 
     const product = {
       name: String(data.get("name") ?? "").trim(),
@@ -56,6 +62,7 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       quantity: Number(data.get("quantity")),
       minimumStock: Number(data.get("minimumStock")),
       category: String(data.get("category") ?? "").trim(),
+      supplier: String(data.get("supplier") ?? "").trim(),
     };
 
     if (!product.name || !product.sku) {
@@ -80,10 +87,21 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       return;
     }
 
+    if (imageFile && !acceptedProductImageTypes.includes(imageFile.type)) {
+      setError("A imagem deve estar no formato JPG, PNG ou WebP.");
+      return;
+    }
+
+    if (imageFile && imageFile.size > maximumProductImageSize) {
+      setError("A imagem deve ter no máximo 3 MB.");
+      return;
+    }
+
     setSaving(true);
     setError("");
 
     try {
+      const imageData = imageFile ? await readProductImageAsDataUrl(imageFile) : null;
       const response = await fetch(productsApiUrl, {
         method: "POST",
         headers: {
@@ -97,13 +115,22 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
           quantidade: product.quantity,
           quantidade_minima: product.minimumStock,
           categoria: product.category,
+          fornecedor: product.supplier,
+          imagem: imageData,
+          imagem_url: imageLinkToSave,
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
 
       if (!response.ok) {
-        setError(result.erro ?? "Erro ao cadastrar produto.");
+        setError(
+          typeof result?.erro === "string"
+            ? result.erro
+            : response.status === 413
+              ? "A imagem excede o limite permitido. Use uma imagem de até 3 MB."
+              : "Erro ao cadastrar produto. Tente novamente.",
+        );
         return;
       }
 
@@ -111,10 +138,11 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
       onCreated?.();
 
       form.reset();
+      setImageUrl("");
       dialogRef.current?.close();
     } catch (erro) {
       console.error("Erro ao cadastrar produto:", erro);
-      setError("Não foi possível conectar ao servidor.");
+      setError(erro instanceof TypeError ? "Não foi possível conectar ao servidor." : erro instanceof Error ? erro.message : "Não foi possível cadastrar o produto.");
     } finally {
       setSaving(false);
     }
@@ -246,6 +274,41 @@ export function NewProductButton({ existingProducts, categories, onCreated, disa
                 placeholder="0"
                 inputMode="numeric"
                 required
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor={`${formId}-supplier`}>Fornecedor</label>
+              <input
+                id={`${formId}-supplier`}
+                name="supplier"
+                maxLength={160}
+                placeholder="Ex.: Fornecedor têxtil"
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor={`${formId}-image-file`}>Enviar imagem (JPG, PNG ou WebP; até 3 MB)</label>
+              <input
+                id={`${formId}-image-file`}
+                name="imageFile"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor={`${formId}-image-url`}>URL da imagem (o arquivo selecionado tem prioridade)</label>
+              <input
+                id={`${formId}-image-url`}
+                name="imageUrl"
+                type="text"
+                maxLength={2048}
+                placeholder="https://exemplo.com/camisa.jpg"
+                value={imageUrl}
+                onChange={(event) => {
+                  setImageUrl(event.target.value);
+                }}
               />
             </div>
 

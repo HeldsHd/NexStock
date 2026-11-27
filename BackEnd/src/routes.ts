@@ -21,6 +21,7 @@ routes.post("/categorias", authentication, categoriaController.create);
 
 // Produtos
 routes.get("/produtos", authentication, produtoController.list);
+routes.get("/produtos/:id/imagem", authentication, produtoController.getImage);
 routes.get("/produtos/:id", authentication, produtoController.getById);
 routes.post("/produtos", authentication, produtoController.create);
 routes.put("/produtos/:id", authentication, produtoController.update);
