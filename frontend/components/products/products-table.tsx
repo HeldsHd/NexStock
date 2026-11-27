@@ -43,7 +43,7 @@ export function ProductsTable({ products, loading, hasFilters, onClearFilters, o
 
   return (
     <div className={styles.tableContainer}>
-      <div className={styles.tableScroll} tabIndex={0} role="region" aria-label="Tabela de produtos; role horizontalmente para ver todas as colunas">
+      <div className={styles.tableScroll} tabIndex={0} role="region" aria-label="Catálogo de produtos">
         <table className={styles.table} aria-busy={loading}>
           <caption className={styles.srOnly}>Catálogo de produtos, códigos, categorias, preços, estoque mínimo, situação e ações</caption>
           <thead>
@@ -87,13 +87,13 @@ export function ProductsTable({ products, loading, hasFilters, onClearFilters, o
                         </button>
                     </div>
                   </th>
-                  <td><span className={product.sku ? styles.sku : styles.missing}>{product.sku || "—"}</span></td>
-                  <td><span className={product.category ? undefined : styles.missing}>{product.category || "—"}</span></td>
-                  <td className={styles.numericCell}>{formatCurrency(product.unitCost)}</td>
-                  <td className={styles.numericCell}>{formatNumber(product.quantity)}</td>
-                  <td className={styles.numericCell}>{formatNumber(product.minimumStock)}</td>
-                  <td><span className={`${styles.statusBadge} ${status.className}`}>{status.label}</span></td>
-                  <td>
+                  <td data-label="SKU"><span className={product.sku ? styles.sku : styles.missing}>{product.sku || "—"}</span></td>
+                  <td data-label="Categoria"><span className={product.category ? undefined : styles.missing}>{product.category || "—"}</span></td>
+                  <td data-label="Preço" className={styles.numericCell}>{formatCurrency(product.unitCost)}</td>
+                  <td data-label="Quantidade" className={styles.numericCell}>{formatNumber(product.quantity)}</td>
+                  <td data-label="Mínimo" className={styles.numericCell}>{formatNumber(product.minimumStock)}</td>
+                  <td data-label="Situação"><span className={`${styles.statusBadge} ${status.className}`}>{status.label}</span></td>
+                  <td data-label="Ações">
                     <div className={styles.rowActions}>
                       <button className={`icon-button ${styles.actionButton}`} type="button" aria-label={`Repor estoque de ${product.name}`} title={`Repor estoque de ${product.name}`} onClick={(event) => onAction(product, "restock", event.currentTarget)}>
                         <Icon name="plus" />
@@ -110,7 +110,7 @@ export function ProductsTable({ products, loading, hasFilters, onClearFilters, o
                     </div>
                   </td>
                 </tr>
-                <tr hidden={!isExpanded}>
+                <tr className={styles.detailsRow} hidden={!isExpanded}>
                   <td colSpan={8} className={styles.detailsCell}>
                     <div id={`product-details-${product.id}`} className={styles.productExpansion}>
                       <figure className={styles.productImage}>
