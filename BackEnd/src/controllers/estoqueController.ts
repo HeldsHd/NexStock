@@ -1,6 +1,7 @@
 
 import type { Request, Response } from "express";
 import { db } from "../db.js";
+import { productJson } from "../utils/productJson.js";
 
 type MovementType = "entrada" | "saida";
 
@@ -43,9 +44,9 @@ async function changeStock(req: Request, res: Response, type: MovementType) {
            quantidade,
            $4
          FROM produto_atualizado
-         RETURNING id
+         RETURNING id, created_at
        )
-       SELECT produto_atualizado.*
+       SELECT ${productJson("produto_atualizado", "movimentacao.created_at")} AS produto
        FROM produto_atualizado
        JOIN movimentacao ON TRUE`,
       [quantidade, produtoId, type, req.session.usuarioNome?.trim() || "Usuário"]
@@ -62,7 +63,7 @@ async function changeStock(req: Request, res: Response, type: MovementType) {
 
     res.json({
       mensagem: type === "entrada" ? "Entrada realizada com sucesso." : "Saída realizada com sucesso.",
-      produto: result.rows[0],
+      produto: result.rows[0].produto,
     });
   } catch (erro) {
     console.error(erro);

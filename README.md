@@ -47,7 +47,7 @@ npm run migrate
 npm run dev
 ```
 
-Configure `DATABASE_URL` e `SESSION_SECRET` no arquivo `BackEnd/.env` antes de executar a migração. Ela cria a tabela de categorias, adiciona a categoria aos produtos, importa as categorias já existentes e prepara o histórico de movimentações de estoque. Acesse [http://localhost:3001](http://localhost:3001). A rota `GET /` responde:
+Configure `DATABASE_URL` e `SESSION_SECRET` no arquivo `BackEnd/.env` antes de executar a migração. Ela cria a tabela de categorias, adiciona a categoria aos produtos, importa as categorias já existentes, prepara o histórico de movimentações, adiciona fornecedor e data de cadastro e cria o armazenamento de imagens dos produtos. No cadastro, as imagens podem ser enviadas como arquivo JPG, PNG ou WebP de até 3 MB, ou informadas por URL. Acesse [http://localhost:3001](http://localhost:3001). A rota `GET /` responde:
 
 ```json
 { "mensagem": "Servidor NexStock funcionando!" }

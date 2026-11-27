@@ -5,6 +5,10 @@ export type CatalogProduct = Product & {
   category: string;
   description: string;
   minimumStock: number;
+  supplier: string;
+  createdAt: string | null;
+  lastMovementAt: string | null;
+  imageUrl: string;
 };
 
 type ApiProduct = {
@@ -16,10 +20,19 @@ type ApiProduct = {
   quantidade_minima?: number | null;
   categoria?: string | null;
   descricao?: string | null;
+  fornecedor?: string | null;
+  created_at?: string | null;
+  ultima_movimentacao?: string | null;
+  imagem_url?: string | null;
 };
 
 export const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
 export const productsApiUrl = `${apiBaseUrl}/produtos`;
+
+export type ProductImageUpdate = {
+  dataUrl?: string;
+  url?: string;
+};
 
 function toCatalogProduct(product: ApiProduct): CatalogProduct {
   return {
@@ -31,6 +44,12 @@ function toCatalogProduct(product: ApiProduct): CatalogProduct {
     minimumStock: product.quantidade_minima ?? 0,
     category: product.categoria?.trim() ?? "",
     description: product.descricao?.trim() ?? "",
+    supplier: product.fornecedor?.trim() ?? "",
+    createdAt: product.created_at ?? null,
+    lastMovementAt: product.ultima_movimentacao ?? null,
+    imageUrl: product.imagem_url?.startsWith("/")
+      ? `${apiBaseUrl}${product.imagem_url}`
+      : product.imagem_url?.trim() ?? "",
   };
 }
 
@@ -61,7 +80,7 @@ export async function listProducts(signal?: AbortSignal): Promise<CatalogProduct
   return result.map(toCatalogProduct);
 }
 
-export async function updateProduct(product: CatalogProduct): Promise<CatalogProduct> {
+export async function updateProduct(product: CatalogProduct, image?: ProductImageUpdate): Promise<CatalogProduct> {
   const response = await fetch(`${productsApiUrl}/${product.id}`, {
     method: "PUT",
     credentials: "include",
@@ -72,6 +91,11 @@ export async function updateProduct(product: CatalogProduct): Promise<CatalogPro
       preco_centavos: Math.round(product.unitCost * 100),
       quantidade_minima: product.minimumStock,
       categoria: product.category,
+      fornecedor: product.supplier,
+      ...(image ? {
+        imagem: image.dataUrl ?? null,
+        imagem_url: image.url ?? null,
+      } : {}),
     }),
   });
   await checkResponse(response, "Não foi possível salvar o produto.");
